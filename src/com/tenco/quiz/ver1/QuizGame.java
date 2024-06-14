@@ -1,4 +1,4 @@
-package com.tenco.quiz;
+package com.tenco.quiz.ver1;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,35 +7,22 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import com.tenco.quiz.DBConnectionManager;
+
 public class QuizGame {
 
-	// 준비물
-	private static final String URL = "jdbc:mysql://localhost:3306/quizdb?serverTimezone=Asia/Seoul";
-	private static final String USER = "root";
-	private static final String PASSWORD = "asd123";
+	private static final String ADD_QUIZ = " insert into quiz(question, answer) values (?,?) ";
+	private static final String VIEW_QUIZ = " select * from quiz ";
+	private static final String RANDOM_QUIZ = " select * from quiz order by rand() limit 1 ";
 
 	public static void main(String[] args) {
 
 		// JDBC 드라이버 로드 <-- 인터페이스 <-- 구현 클래스 필요
 
-		try {
-			Class.forName("com.mysql.cj.jdbc.Driver");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-
-		try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
-				Scanner scanner = new Scanner(System.in)) {
+		try (Connection conn = DBConnectionManager.getConnection(); Scanner scanner = new Scanner(System.in)) {
 
 			while (true) {
-				System.out.println();
-				System.out.println("==========================================");
-				System.out.println("1. 퀴즈 문제 추가");
-				System.out.println("2. 퀴즈 문제 조회");
-				System.out.println("3. 퀴즈 게임 시작");
-				System.out.println("4. 종료");
-				System.out.print("옵션을 선택 하세요 : ");
+				PrintMenu();
 
 				int choice = scanner.nextInt(); // 블로킹
 
@@ -57,14 +44,24 @@ public class QuizGame {
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 
 	} // end of main
 
-	private static void playQuizGame(Connection conn, Scanner scanner) {
-		String sql = " select * from quiz order by rand() limit 1 ";
+	private static void PrintMenu() {
+		System.out.println();
+		System.out.println("==========================================");
+		System.out.println("1. 퀴즈 문제 추가");
+		System.out.println("2. 퀴즈 문제 조회");
+		System.out.println("3. 퀴즈 게임 시작");
+		System.out.println("4. 종료");
+		System.out.print("옵션을 선택 하세요 : ");
+	}
 
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+	private static void playQuizGame(Connection conn, Scanner scanner) {
+
+		try (PreparedStatement pstmt = conn.prepareStatement(RANDOM_QUIZ)) {
 			ResultSet rs = pstmt.executeQuery();
 
 			if (rs.next()) {
@@ -94,9 +91,8 @@ public class QuizGame {
 	}
 
 	private static void viewQuizQuestion(Connection conn) {
-		String sql = " select * from quiz ";
 
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement pstmt = conn.prepareStatement(VIEW_QUIZ)) {
 
 			ResultSet resultSet = pstmt.executeQuery();
 			while (resultSet.next()) {
@@ -120,8 +116,7 @@ public class QuizGame {
 		System.out.println("퀴즈 정답을 입력하세요 : ");
 		String answer = sc.nextLine();
 
-		String sql = " insert into quiz(question, answer) values (?,?) ";
-		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+		try (PreparedStatement pstmt = conn.prepareStatement(ADD_QUIZ)) {
 			pstmt.setString(1, question);
 			pstmt.setString(2, answer);
 			int rowsInsertedCount = pstmt.executeUpdate();
