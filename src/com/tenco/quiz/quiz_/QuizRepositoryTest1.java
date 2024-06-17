@@ -11,25 +11,24 @@ public class QuizRepositoryTest1 {
 		// 실행에 흐름 여러분 직접 만들어 보세요s
 
 		QuizRepositoryImpl quizRepositoryImpl = new QuizRepositoryImpl();
-		
+
 		try {
 			QuizDTO dto = quizRepositoryImpl.playQuizGame();
-			
+
 			System.out.println(dto.getQuestion());
 			Scanner scanner = new Scanner(System.in);
-			
-			if(dto.getAnswer().equalsIgnoreCase(scanner.nextLine())) {
+
+			if (dto.getAnswer().equalsIgnoreCase(scanner.nextLine())) {
 				System.out.println("정답입니다.");
-				System.out.println("점수 : " + score);
+				System.out.println("점수 : ");
 			} else {
 				System.out.println("오답입니다.");
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		
+
 	}
 
 }
