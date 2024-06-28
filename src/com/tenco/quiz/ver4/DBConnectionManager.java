@@ -48,7 +48,6 @@ public class DBConnectionManager {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 // 기본 JDBC 드라이버 사용 버전
